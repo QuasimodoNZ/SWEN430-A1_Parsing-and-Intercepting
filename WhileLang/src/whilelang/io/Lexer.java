@@ -28,6 +28,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import whilelang.MyLogger;
 import whilelang.util.SyntaxError;
 
 /**
@@ -77,7 +78,11 @@ public class Lexer {
 		while (pos < input.length()) {
 			char c = input.charAt(pos);
 
-			if (Character.isDigit(c)) {
+			if (c == '/' && input.charAt(pos + 1) == '/') {
+				skipSingleLineComment();
+			} else if (c == '/' && input.charAt(pos + 1) == '*') {
+				skipMultiLineComment();
+			} else if (Character.isDigit(c)) {
 				tokens.add(scanNumericConstant());
 			} else if (c == '"') {
 				tokens.add(scanStringConstant());
@@ -95,6 +100,20 @@ public class Lexer {
 		}
 
 		return tokens;
+	}
+
+	private void skipSingleLineComment() {
+		while (input.charAt(pos) != '\n' && pos < input.length()) {
+			pos++;
+		}
+	}
+
+	private void skipMultiLineComment() {
+		while (!(input.charAt(pos) == '*' && input.charAt(pos + 1) == '/')
+				&& pos < input.length()) {
+			pos++;
+		}
+		pos += 2;
 	}
 
 	/**
@@ -176,8 +195,8 @@ public class Lexer {
 
 	protected String parseString(String v) {
 		/*
-		 * Parsing a string requires several steps to be taken. First, we need to
-		 * strip quotes from the ends of the string.
+		 * Parsing a string requires several steps to be taken. First, we need
+		 * to strip quotes from the ends of the string.
 		 */
 		v = v.substring(1, v.length() - 1);
 		int start = pos - v.length();
@@ -245,11 +264,11 @@ public class Lexer {
 	static final char UC_LOGICALAND = '\u2227';
 	static final char UC_LOGICALOR = '\u2228';
 
-	static final char[] opStarts = { ',', '(', ')', '[', ']', '{', '}', '+', '-',
-		'*', '/', '%', '!', '?', '=', '<', '>', ':', ';', '&', '|', '.', '~',
-		UC_FORALL, UC_EXISTS, UC_EMPTYSET, UC_SUBSET, UC_SUBSETEQ, UC_SUPSET,
-		UC_SUPSETEQ, UC_SETUNION, UC_SETINTERSECTION, UC_LESSEQUALS,
-		UC_GREATEREQUALS, UC_ELEMENTOF };
+	static final char[] opStarts = { ',', '(', ')', '[', ']', '{', '}', '+',
+			'-', '*', '/', '%', '!', '?', '=', '<', '>', ':', ';', '&', '|',
+			'.', '~', UC_FORALL, UC_EXISTS, UC_EMPTYSET, UC_SUBSET,
+			UC_SUBSETEQ, UC_SUPSET, UC_SUPSETEQ, UC_SETUNION,
+			UC_SETINTERSECTION, UC_LESSEQUALS, UC_GREATEREQUALS, UC_ELEMENTOF };
 
 	public boolean isOperatorStart(char c) {
 		for (char o : opStarts) {
@@ -263,7 +282,7 @@ public class Lexer {
 	public Token scanOperator() {
 		char c = input.charAt(pos);
 
-		if (c == '.') {			
+		if (c == '.') {
 			return new Dot(pos++);
 		} else if (c == ',') {
 			return new Comma(pos++);
@@ -286,13 +305,13 @@ public class Lexer {
 		} else if (c == '}') {
 			return new RightCurly(pos++);
 		} else if (c == '+') {
-			if((pos+1) < input.length() && input.charAt(pos+1) == '+') {
+			if ((pos + 1) < input.length() && input.charAt(pos + 1) == '+') {
 				pos = pos + 2;
 				return new PlusPlus(pos);
 			} else {
 				return new Plus(pos++);
 			}
-		} else if (c == '-') {			
+		} else if (c == '-') {
 			return new Minus(pos++);
 		} else if (c == '*') {
 			return new Star(pos++);
@@ -300,9 +319,9 @@ public class Lexer {
 				&& input.charAt(pos + 1) == '&') {
 			pos += 2;
 			return new LogicalAnd("&&", pos - 2);
-		} else if (c == '/') {			
+		} else if (c == '/') {
 			return new RightSlash(pos++);
-		} else if (c == '%') {			
+		} else if (c == '%') {
 			return new Percent(pos++);
 		} else if (c == '!') {
 			if ((pos + 1) < input.length() && input.charAt(pos + 1) == '=') {
@@ -347,8 +366,8 @@ public class Lexer {
 	}
 
 	public static final String[] keywords = { "true", "false", "null", "void",
-		"int", "real", "char", "string", "bool", "if", "switch", "while", "else",
-		"is", "for", "debug", "print", "return", "const", "type" };
+			"int", "real", "char", "string", "bool", "if", "switch", "while",
+			"else", "is", "for", "debug", "print", "return", "const", "type" };
 
 	public Token scanIdentifier() {
 		int start = pos;
@@ -368,7 +387,7 @@ public class Lexer {
 		// otherwise, must be identifier
 		return new Identifier(text, start);
 	}
-	
+
 	/**
 	 * Skip over any whitespace at the current index position in the input
 	 * string.
@@ -460,7 +479,7 @@ public class Lexer {
 
 	/**
 	 * Represents a character constant. That is, a single digit enclosed in
-	 * single quotes.  E.g. 'c'
+	 * single quotes. E.g. 'c'
 	 * 
 	 * @author David J. Pearce
 	 * 
@@ -539,7 +558,7 @@ public class Lexer {
 			super(":", pos);
 		}
 	}
-	
+
 	public static class Bar extends Token {
 		public Bar(int pos) {
 			super("|", pos);
@@ -607,7 +626,7 @@ public class Lexer {
 			super("++", pos);
 		}
 	}
-	
+
 	public static class Plus extends Token {
 		public Plus(int pos) {
 			super("+", pos);
@@ -633,7 +652,7 @@ public class Lexer {
 			super("\\", pos);
 		}
 	}
-	
+
 	public static class RightSlash extends Token {
 
 		public RightSlash(int pos) {
