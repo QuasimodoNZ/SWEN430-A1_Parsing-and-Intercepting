@@ -1,4 +1,5 @@
-/*  Single Line Comment Test */
+const PI is 3.1415
+
 void main() {
-     print 5;
+  print PI;
 }
