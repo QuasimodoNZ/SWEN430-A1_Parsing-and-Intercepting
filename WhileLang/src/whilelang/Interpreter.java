@@ -116,6 +116,8 @@ public class Interpreter {
 			return execute((Stmt.Assign) stmt, frame);
 		} else if (stmt instanceof Stmt.For) {
 			return execute((Stmt.For) stmt, frame);
+		} else if (stmt instanceof Stmt.Switch) {
+			return execute((Stmt.Switch) stmt, frame);
 		} else if (stmt instanceof Stmt.While) {
 			return execute((Stmt.While) stmt, frame);
 		} else if (stmt instanceof Stmt.IfElse) {
@@ -174,6 +176,38 @@ public class Interpreter {
 				return ret;
 			}
 			execute(stmt.getIncrement(), frame);
+		}
+		return null;
+	}
+
+	private Object execute(Stmt.Switch switchStmt, HashMap<String, Object> frame) {
+		Object controlVariable = execute(switchStmt.getExpr(), frame);
+		List<Stmt> stmts = switchStmt.getBody();
+		int i = 0;
+		int defaultIndex = -1;
+		while (i < stmts.size()) {
+			Stmt stmt = stmts.get(i);
+			if (stmt instanceof Stmt.Case) {
+				Object caseValue = execute(((Stmt.Case) stmt).getExpr(), frame);
+				if (controlVariable.equals(caseValue)) {
+					i++;
+					break;
+				}
+			}
+			i++;
+		}
+		//Handles the default case , we might have to back pedal a bit.
+		if (i == stmts.size() && defaultIndex != -1) {
+			i = defaultIndex;
+		}
+		while (i < stmts.size()) {
+			Stmt stmt = stmts.get(i);
+			if (!(stmt instanceof Stmt.Case)) {
+				Object returnValue = execute(stmt, frame);
+				if (returnValue != null)
+					return returnValue;
+			}
+			i++;
 		}
 		return null;
 	}

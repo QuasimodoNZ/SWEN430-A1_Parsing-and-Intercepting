@@ -20,7 +20,9 @@ package whilelang.lang;
 
 import java.util.*;
 
+import whilelang.lang.WhileFile.FunDecl;
 import whilelang.util.*;
+import whilelang.util.Attribute.Source;
 
 /**
  * Represents a statement in the source code of a While program. Many standard
@@ -313,8 +315,8 @@ public interface Stmt extends SyntacticElement {
 		 *            A list of zero or more statements, which may not be null.
 		 * @param attributes
 		 */
-		public For(VariableDeclaration declaration, Expr condition, Stmt increment,
-				Collection<Stmt> body, Attribute... attributes) {
+		public For(VariableDeclaration declaration, Expr condition,
+				Stmt increment, Collection<Stmt> body, Attribute... attributes) {
 			super(attributes);
 			this.declaration = declaration;
 			this.condition = condition;
@@ -337,8 +339,9 @@ public interface Stmt extends SyntacticElement {
 		 *            A list of zero or more statements, which may not be null.
 		 * @param attributes
 		 */
-		public For(VariableDeclaration declaration, Expr condition, Stmt increment,
-				Collection<Stmt> body, Collection<Attribute> attributes) {
+		public For(VariableDeclaration declaration, Expr condition,
+				Stmt increment, Collection<Stmt> body,
+				Collection<Attribute> attributes) {
 			super(attributes);
 			this.declaration = declaration;
 			this.condition = condition;
@@ -360,7 +363,7 @@ public interface Stmt extends SyntacticElement {
 		 * 
 		 * @return May be null.
 		 */
-		public Expr getCondition() {			
+		public Expr getCondition() {
 			return condition;
 		}
 
@@ -384,18 +387,46 @@ public interface Stmt extends SyntacticElement {
 	}
 
 	/**
+	 * @author Benjamin Riddell
+	 *
+	 */
+	public static final class Switch extends SyntacticElement.Impl implements
+			Stmt {
+
+		Expr controlExpr;
+		List<Stmt> body;
+
+		public Switch(Expr controlExpr, Collection<Stmt> body,
+				Attribute... attributes) {
+			super(attributes);
+			this.controlExpr = controlExpr;
+			this.body = new ArrayList<Stmt>(body);
+		}
+
+		public Expr getExpr() {
+			return controlExpr;
+		}
+
+		public List<Stmt> getBody() {
+			return this.body;
+		}
+	}
+
+	/**
 	 * Represents a classical if-else statement, made up from a
-	 * <i>condition</i>, <i>true branch</i> and <i>false branch</i>.
-	 * The following illustrates:
+	 * <i>condition</i>, <i>true branch</i> and <i>false branch</i>. The
+	 * following illustrates:
+	 * 
 	 * <pre>
 	 * int max(int x, int y) {
-	 *   if(x > y) {
-	 *     return x;
-	 *   } else {
-	 *     return y;
-	 *   }
+	 * 	if (x &gt; y) {
+	 * 		return x;
+	 * 	} else {
+	 * 		return y;
+	 * 	}
 	 * }
 	 * </pre>
+	 * 
 	 * @author David J. Pearce
 	 * 
 	 */
@@ -537,6 +568,24 @@ public interface Stmt extends SyntacticElement {
 		}
 	}
 
+	public class Case extends SyntacticElement.Impl implements Stmt {
+		Expr expr;
+
+		public Case(Expr expr, Attribute... attributes) {
+			super(attributes);
+			this.expr = expr;
+		}
+
+		public Expr getExpr() {
+			return expr;
+		}
+
+		@Override
+		public String toString() {
+			return "case " + this.expr.toString() + ":";
+		}
+	}
+
 	/**
 	 * Represents a variable declaration which is made up from a type, a
 	 * variable name and an (optional) initialiser expression. If an initialiser
@@ -555,8 +604,8 @@ public interface Stmt extends SyntacticElement {
 	 * @author David J. Pearce
 	 * 
 	 */
-	public static final class VariableDeclaration extends SyntacticElement.Impl implements
-			Stmt {
+	public static final class VariableDeclaration extends SyntacticElement.Impl
+			implements Stmt {
 		private final Type type;
 		private final String name;
 		private final Expr expr;
@@ -610,7 +659,7 @@ public interface Stmt extends SyntacticElement {
 		}
 
 		/**
-		 * Get the type of the variable being declared.  
+		 * Get the type of the variable being declared.
 		 * 
 		 * @return Guaranteed to be non-null.
 		 */
@@ -619,7 +668,7 @@ public interface Stmt extends SyntacticElement {
 		}
 
 		/**
-		 * Get the name of the variable being declared.  
+		 * Get the name of the variable being declared.
 		 * 
 		 * @return Guaranteed to be non-null.
 		 */
