@@ -447,8 +447,18 @@ public class Interpreter {
 	private Object execute(Expr.Variable expr, HashMap<String, Object> frame) {
 		if (frame.containsKey(expr.getName()))
 			return frame.get(expr.getName());
-		else
-			return constants.get(expr.getName());
+		else if (constants.containsKey(expr.getName())) {
+			Expr constant = constants.get(expr.getName());
+			if (constant instanceof Expr.Binary)
+				return execute((Expr.Binary) constant, frame);
+			else if (constant instanceof Expr.ListConstructor) {
+				return execute((Expr.ListConstructor) constant, frame);
+			} else if (constant instanceof Expr.RecordConstructor) {
+				return execute((Expr.RecordConstructor) constant, frame);
+			}
+			return ((Expr.Constant) constant).getValue();
+		}
+		return null;
 	}
 
 	/**
