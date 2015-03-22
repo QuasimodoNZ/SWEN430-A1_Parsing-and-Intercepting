@@ -179,6 +179,32 @@ public interface Stmt extends SyntacticElement {
 		}
 	}
 
+	public static final class Break extends SyntacticElement.Impl implements
+			Stmt {
+
+		public Break(Attribute... attributes) {
+			super(attributes);
+		}
+
+		@Override
+		public String toString() {
+			return "break";
+		}
+	}
+
+	public static final class Default extends SyntacticElement.Impl implements
+			Stmt {
+
+		public Default(Attribute... attributes) {
+			super(attributes);
+		}
+
+		@Override
+		public String toString() {
+			return "default";
+		}
+	}
+
 	/**
 	 * Represents a while statement whose body is made up from a block of
 	 * statements separated by curly braces. Note that, unlike C or Java, the

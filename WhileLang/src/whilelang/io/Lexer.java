@@ -368,8 +368,8 @@ public class Lexer {
 
 	public static final String[] keywords = { "true", "false", "null", "void",
 			"int", "real", "char", "string", "bool", "if", "switch", "case",
-			"while", "else", "is", "for", "debug", "print", "return", "const",
-			"type" };
+			"default", "while", "else", "is", "for", "debug", "print", "break",
+			"return", "const", "type" };
 
 	public Token scanIdentifier() {
 		int start = pos;

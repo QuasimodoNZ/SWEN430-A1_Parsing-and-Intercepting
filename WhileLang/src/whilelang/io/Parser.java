@@ -154,6 +154,11 @@ public class Parser {
 			if (withSemiColon) {
 				match(";");
 			}
+		} else if (token.text.equals("break")) {
+			stmt = parseBreak();
+			if (withSemiColon) {
+				match(";");
+			}
 		} else if (token.text.equals("print")) {
 			stmt = parsePrint();
 			if (withSemiColon) {
@@ -169,6 +174,8 @@ public class Parser {
 			stmt = parseSwitch();
 		} else if (token.text.equals("case")) {
 			stmt = parseCase();
+		} else if (token.text.equals("default")) {
+			stmt = parseDefault();
 		} else if ((index + 1) < tokens.size()
 				&& tokens.get(index + 1) instanceof LeftBrace) {
 			// must be a method invocation
@@ -275,6 +282,12 @@ public class Parser {
 		return new Stmt.Return(e, sourceAttr(start, index - 1));
 	}
 
+	private Stmt parseBreak() {
+		int start = index;
+		matchKeyword("break");
+		return new Stmt.Break(sourceAttr(start, index - 1));
+	}
+
 	private Stmt.Print parsePrint() {
 		int start = index;
 		matchKeyword("print");
@@ -291,6 +304,14 @@ public class Parser {
 		match(":");
 		int end = index;
 		return new Stmt.Case(e, sourceAttr(start, end - 1));
+	}
+
+	private Stmt parseDefault() {
+		int start = index;
+		matchKeyword("default");
+		match(":");
+		int end = index;
+		return new Stmt.Default(sourceAttr(start, end - 1));
 	}
 
 	private Stmt parseIf() {

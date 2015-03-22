@@ -193,16 +193,21 @@ public class Interpreter {
 					i++;
 					break;
 				}
+			} else if (stmt instanceof Stmt.Default) {
+				defaultIndex = i;
 			}
 			i++;
 		}
-		//Handles the default case , we might have to back pedal a bit.
+		// Handles the default case , we might have to back pedal a bit.
 		if (i == stmts.size() && defaultIndex != -1) {
-			i = defaultIndex;
+			i = defaultIndex + 1;
 		}
 		while (i < stmts.size()) {
 			Stmt stmt = stmts.get(i);
+
 			if (!(stmt instanceof Stmt.Case)) {
+				if (stmt instanceof Stmt.Break)
+					return null;
 				Object returnValue = execute(stmt, frame);
 				if (returnValue != null)
 					return returnValue;
