@@ -18,9 +18,12 @@
 
 package whilelang;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 import whilelang.lang.*;
+import whilelang.lang.Expr.IsInstanceOf;
 import whilelang.lang.WhileFile.ConstDecl;
 import whilelang.util.Pair;
 import static whilelang.util.SyntaxError.*;
@@ -298,6 +301,8 @@ public class Interpreter {
 			return execute((Expr.Unary) expr, frame);
 		} else if (expr instanceof Expr.Variable) {
 			return execute((Expr.Variable) expr, frame);
+		} else if (expr instanceof Expr.IsInstanceOf) {
+			return execute((Expr.IsInstanceOf) expr, frame);
 		} else {
 			internalFailure("unknown expression encountered (" + expr + ")",
 					file.filename, expr);
@@ -395,6 +400,38 @@ public class Interpreter {
 		internalFailure("unknown binary expression encountered (" + expr + ")",
 				file.filename, expr);
 		return null;
+	}
+
+	private Object execute(Expr.IsInstanceOf expr, HashMap<String, Object> frame) {
+		Object subject = execute(expr.getSubject(), frame);
+
+		return isInstanceOf(subject, expr.getType());
+	}
+
+	private boolean isInstanceOf(Object subject, Type type) {
+		if (subject instanceof List) {
+			if (!(type instanceof Type.List))
+				return false;
+			return isInstanceOf(((List) subject).get(0),
+					((Type.List) type).getElement());
+		}
+
+		switch (type.toString()) {
+		case "char":
+			return subject instanceof Character;
+		case "bool":
+			return subject instanceof Boolean;
+		case "null":
+			// return subject instanceof
+		case "string":
+			return subject instanceof WhileyString;
+		case "real":
+			return subject instanceof Double;
+		case "int":
+			return subject instanceof Integer;
+		default:
+			return false;
+		}
 	}
 
 	private Object execute(Expr.Cast expr, HashMap<String, Object> frame) {

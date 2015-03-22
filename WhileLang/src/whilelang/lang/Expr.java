@@ -21,6 +21,7 @@ package whilelang.lang;
 import java.util.*;
 
 import whilelang.util.*;
+import whilelang.util.Attribute.Source;
 
 /**
  * Represents an expression in the source code of a While program. Many standard
@@ -31,6 +32,31 @@ import whilelang.util.*;
  * expressions (e.g. <code>r.f</code>, <code>{x: 1, y: 2}</code>, etc).
  */
 public interface Expr extends SyntacticElement {
+
+	public class IsInstanceOf extends SyntacticElement.Impl implements Expr {
+		Expr subject;
+		Type type;
+		Source source;
+
+		public IsInstanceOf(Expr lhs, Type t, Source sourceAttr) {
+			super(sourceAttr);
+			this.subject = lhs;
+			this.type = t;
+			this.source = sourceAttr;
+		}
+
+		public Expr getSubject() {
+			return this.subject;
+		}
+
+		public Type getType() {
+			return this.type;
+		}
+
+		public Source getSource() {
+			return this.source;
+		}
+	}
 
 	/**
 	 * Captures the expression kinds which are permitted on the left-side of an
@@ -106,8 +132,8 @@ public interface Expr extends SyntacticElement {
 		 *            Must be an instance of <code>java.lang.Boolean</code>,
 		 *            <code>java.lang.Character</code>,
 		 *            <code>java.lang.Integer</code>,
-		 *            <code>java.lang.Double</code>,
-		 *            <code>MyString</code> or <code>null</code>.
+		 *            <code>java.lang.Double</code>, <code>MyString</code> or
+		 *            <code>null</code>.
 		 * @param attributes
 		 */
 		public Constant(Object value, Attribute... attributes) {
@@ -116,7 +142,7 @@ public interface Expr extends SyntacticElement {
 		}
 
 		public String toString() {
-			if(value == null) {
+			if (value == null) {
 				return "null";
 			} else {
 				return value.toString();
@@ -217,6 +243,11 @@ public interface Expr extends SyntacticElement {
 		APPEND {
 			public String toString() {
 				return "++";
+			}
+		},
+		IS {
+			public String toString() {
+				return "is";
 			}
 		}
 	};
@@ -324,8 +355,8 @@ public interface Expr extends SyntacticElement {
 	 * @author David J. Pearce
 	 * 
 	 */
-	public static class IndexOf extends SyntacticElement.Impl implements
-			Expr, LVal {
+	public static class IndexOf extends SyntacticElement.Impl implements Expr,
+			LVal {
 		private final Expr source;
 		private final Expr index;
 
@@ -461,13 +492,13 @@ public interface Expr extends SyntacticElement {
 	public static class Cast extends SyntacticElement.Impl implements Expr {
 		private final Type type;
 		private final Expr source;
-		
+
 		public Cast(Type type, Expr src, Attribute... attributes) {
 			super(attributes);
 			this.type = type;
 			this.source = src;
 		}
-		
+
 		public Cast(Type type, Expr src, Collection<Attribute> attributes) {
 			super(attributes);
 			this.type = type;
@@ -482,6 +513,7 @@ public interface Expr extends SyntacticElement {
 			return type;
 		}
 	}
+
 	/**
 	 * Represents a list constructor which constructs a list value from zero or
 	 * more element expressions. For example, <code>[1,2,3]</code>,
@@ -633,7 +665,7 @@ public interface Expr extends SyntacticElement {
 		 */
 		public List<Pair<String, Expr>> getFields() {
 			return fields;
-		}				
+		}
 	}
 
 	/**

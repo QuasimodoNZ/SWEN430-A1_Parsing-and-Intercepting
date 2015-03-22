@@ -454,6 +454,11 @@ public class Parser {
 			Expr rhs = parseAppendExpression();
 			return new Expr.Binary(Expr.BOp.NEQ, lhs, rhs, sourceAttr(start,
 					index - 1));
+		} else if (index < tokens.size() && tokens.get(index).text.equals("is")) {
+			match("is");
+			Type rhs = parseType();
+			return new Expr.IsInstanceOf(lhs, rhs, sourceAttr(start,
+					index - 1));
 		} else {
 			return lhs;
 		}
