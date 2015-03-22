@@ -379,12 +379,12 @@ public class Interpreter {
 				return ((Double) lhs) >= ((Double) rhs);
 			}
 		case APPEND:
-			if (lhs instanceof String && rhs instanceof String) {
-				return ((String) lhs) + ((String) rhs);
-			} else if (lhs instanceof String) {
-				return ((String) lhs) + toString(rhs);
-			} else if (rhs instanceof String) {
-				return toString(lhs) + ((String) rhs);
+			if (lhs instanceof WhileyString && rhs instanceof WhileyString) {
+				return (lhs.toString()) + (rhs.toString());
+			} else if (lhs instanceof WhileyString) {
+				return (lhs.toString()) + toString(rhs);
+			} else if (rhs instanceof WhileyString) {
+				return toString(lhs) + (rhs.toString());
 			} else if (lhs instanceof ArrayList && rhs instanceof ArrayList) {
 				ArrayList l = (ArrayList) lhs;
 				l.addAll((ArrayList) rhs);
@@ -511,7 +511,7 @@ public class Interpreter {
 	 * @return
 	 */
 	private Object deepClone(Object o) {
-		if (o instanceof ArrayList) {
+		if (o instanceof ArrayList && !(o instanceof WhileyString)) {
 			ArrayList<Object> l = (ArrayList) o;
 			ArrayList<Object> n = new ArrayList<Object>();
 			for (int i = 0; i != l.size(); ++i) {
@@ -542,7 +542,7 @@ public class Interpreter {
 	 * @return
 	 */
 	private String toString(Object o) {
-		if (o instanceof ArrayList) {
+		if (o instanceof ArrayList && !(o instanceof WhileyString)) {
 			ArrayList<Object> l = (ArrayList) o;
 			String r = "[";
 			for (int i = 0; i != l.size(); ++i) {

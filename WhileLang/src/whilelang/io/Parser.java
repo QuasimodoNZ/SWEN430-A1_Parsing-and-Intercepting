@@ -26,6 +26,7 @@ import whilelang.lang.Expr;
 import whilelang.lang.Stmt;
 import whilelang.lang.Type;
 import whilelang.lang.WhileFile;
+import whilelang.lang.WhileyString;
 import whilelang.lang.WhileFile.*;
 import whilelang.util.Attribute;
 import whilelang.util.Pair;
@@ -720,7 +721,8 @@ public class Parser {
 
 	private Expr parseString() {
 		int start = index;
-		String s = match(Strung.class, "a string").string;
+		WhileyString s = WhileyString.asWhileyString(match(Strung.class,
+				"a string").string);
 		return new Expr.Constant(s, sourceAttr(start, index - 1));
 	}
 

@@ -107,7 +107,7 @@ public interface Expr extends SyntacticElement {
 		 *            <code>java.lang.Character</code>,
 		 *            <code>java.lang.Integer</code>,
 		 *            <code>java.lang.Double</code>,
-		 *            <code>java.lang.String</code> or <code>null</code>.
+		 *            <code>MyString</code> or <code>null</code>.
 		 * @param attributes
 		 */
 		public Constant(Object value, Attribute... attributes) {
