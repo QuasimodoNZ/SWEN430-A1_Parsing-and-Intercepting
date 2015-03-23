@@ -391,7 +391,8 @@ public class Interpreter {
 			} else if (rhs instanceof WhileyString) {
 				return toString(lhs) + (rhs.toString());
 			} else if (lhs instanceof ArrayList && rhs instanceof ArrayList) {
-				ArrayList l = (ArrayList) lhs;
+				// ArrayList l = (ArrayList) lhs;
+				ArrayList l = new ArrayList((ArrayList) lhs);
 				l.addAll((ArrayList) rhs);
 				return l;
 			}
@@ -409,11 +410,23 @@ public class Interpreter {
 	}
 
 	private boolean isInstanceOf(Object subject, Type type) {
+		if (type instanceof Type.Union) {
+			for (Type t : ((Type.Union) type).getBounds())
+				if (isInstanceOf(subject, t))
+					return true;
+			return false;
+		}
+
 		if (subject instanceof List) {
 			if (!(type instanceof Type.List))
 				return false;
 			return isInstanceOf(((List) subject).get(0),
 					((Type.List) type).getElement());
+		}
+
+		if (type instanceof Type.Named) {
+			System.out.println("Named type");
+			return false;
 		}
 
 		switch (type.toString()) {
@@ -422,7 +435,7 @@ public class Interpreter {
 		case "bool":
 			return subject instanceof Boolean;
 		case "null":
-			// return subject instanceof
+			return subject == null;
 		case "string":
 			return subject instanceof WhileyString;
 		case "real":
