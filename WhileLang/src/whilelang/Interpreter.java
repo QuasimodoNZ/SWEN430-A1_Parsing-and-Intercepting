@@ -25,6 +25,7 @@ import java.util.*;
 import whilelang.lang.*;
 import whilelang.lang.Expr.IsInstanceOf;
 import whilelang.lang.WhileFile.ConstDecl;
+import whilelang.lang.WhileFile.TypeDecl;
 import whilelang.util.Pair;
 import static whilelang.util.SyntaxError.*;
 
@@ -425,8 +426,14 @@ public class Interpreter {
 		}
 
 		if (type instanceof Type.Named) {
-			System.out.println("Named type");
-			return false;
+			String name = ((Type.Named) type).getName();
+
+			if (!declarations.containsKey(name)) {
+				System.out.println("Unknown type check on: " + name);
+				return false;
+			}
+			return isInstanceOf(subject,
+					((TypeDecl) (declarations.get(name))).type);
 		}
 
 		switch (type.toString()) {
