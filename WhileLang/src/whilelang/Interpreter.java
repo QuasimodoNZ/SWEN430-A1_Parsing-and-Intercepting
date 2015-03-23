@@ -424,6 +424,12 @@ public class Interpreter {
 			return isInstanceOf(((List) subject).get(0),
 					((Type.List) type).getElement());
 		}
+		
+		if(subject instanceof HashMap){
+			if(type instanceof Type.Record){
+				return true;
+			}
+		}
 
 		if (type instanceof Type.Named) {
 			String name = ((Type.Named) type).getName();
@@ -436,6 +442,8 @@ public class Interpreter {
 					((TypeDecl) (declarations.get(name))).type);
 		}
 
+		
+		
 		switch (type.toString()) {
 		case "char":
 			return subject instanceof Character;
